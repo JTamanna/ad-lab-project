@@ -210,3 +210,114 @@ payButton.addEventListener("click", function (event) {
 closeConfirmation.addEventListener("click", function () {
   confirmationScreen.style.display = "none";
 });
+
+// Existing features...
+
+// Cart array to store added items
+let cart = [];
+
+// Add product to cart function
+function addToCart(product, selectedColor, selectedSize, quantity = 1) {
+    const cartItem = {
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        color: selectedColor,
+        size: selectedSize,
+        quantity: quantity
+    };
+
+    cart.push(cartItem);
+    alert(`${product.title} added to cart!`);
+    updateCartIcon();
+}
+
+// Update cart icon or counter
+function updateCartIcon() {
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) {
+        cartCount.textContent = cart.length;
+    }
+}
+
+// Trigger add to cart when clicking the productButton
+const productButton = document.querySelector(".productButton");
+
+productButton.addEventListener("click", () => {
+    // Get selected color
+    let selectedColor = choosenProduct.colors[0].code;
+    currentProductColors.forEach((color, index) => {
+        if (color.style.border === '2px solid #000' || color.style.backgroundColor === 'black') {
+            selectedColor = choosenProduct.colors[index].code;
+        }
+    });
+
+    // Get selected size
+    let selectedSize = null;
+    currentProductSizes.forEach(size => {
+        if (size.style.backgroundColor === 'black') {
+            selectedSize = size.textContent;
+        }
+    });
+
+    if (!selectedSize) {
+        alert("Please select a size!");
+        return;
+    }
+
+    addToCart(choosenProduct, selectedColor, selectedSize);
+});
+
+// ===== Show Cart Modal/Page =====
+const cartButton = document.querySelector('.cartBtn'); // We'll add this in the HTML
+cartButton.addEventListener('click', () => {
+    renderCart();
+    document.querySelector('.cartModal').style.display = 'block';
+});
+
+const closeCart = document.querySelector('.closeCart');
+closeCart.addEventListener('click', () => {
+    document.querySelector('.cartModal').style.display = 'none';
+});
+
+function renderCart() {
+    const cartItemsContainer = document.querySelector('.cartItems');
+    cartItemsContainer.innerHTML = ''; // Clear previous content
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+    }
+
+    cart.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('cartItem');
+        itemElement.innerHTML = `
+            <h4>${item.title} (${item.size})</h4>
+            <p>Color: ${item.color}</p>
+            <p>Quantity: ${item.quantity}</p>
+            <p>Price: $${item.price}</p>
+            <button onclick="removeFromCart(${index})">Remove</button>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+    });
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    renderCart();
+    updateCartIcon();
+}
+function checkoutCart() {
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    // This can be expanded to an actual checkout page later
+    alert("Proceeding to checkout...");
+    cart = []; // Clear cart after checkout
+    renderCart();
+    updateCartIcon();
+    document.querySelector('.cartModal').style.display = 'none';
+}
